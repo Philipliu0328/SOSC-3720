@@ -1,0 +1,353 @@
+---
+title: 'Assignment 4: Network Representation, Connectivity, and Centrality'
+author: 'Liu Kam Chiu (SID: 21065572) ; Mak Tak Yi (SID:21053646) '
+date: 'Due: 24 Nov 2026  11:59pm'
+output:
+  pdf_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+subtitle: 'SOSC 3720 — Social Network Analysis — Fall 2026'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+**Instructions.** This assignment is based on Tutorial 7 (R Network Analysis). Complete the code in every chunk marked `???`, run the chunks, and answer all written questions. Knit your `.Rmd` file to HTML or PDF and submit the output together with the `.Rmd` file.
+
+```{r libraries, eval=FALSE}
+library(igraph)
+```
+
+\newpage
+
+# Question 1: Network Representation (25 pts)
+
+This question asks you to build the same kind of small networks we made in Tutorial 7 Part 1.
+
+## Part (a): Build a network from an edge list (5 pts)
+
+Fill in the two lines marked `???` and run the chunk.
+
+```{r q1a, eval=FALSE}
+edges <- data.frame(
+  source = c(1, 1, 2, 2, 3),
+  target = c(2, 4, 3, 4, 4)
+)
+
+g1 <- ???                               # create an undirected graph from edges
+cat("Number of nodes:", ???, "\n")      # number of nodes
+cat("Number of edges:", ???, "\n")      # number of edges
+
+plot(g1, vertex.size = 30, vertex.color = "lightblue",
+     vertex.label.cex = 1.2, main = "Network from Edge List")
+```
+
+## Part (b): Build a network from an adjacency matrix (5 pts)
+
+Fill in the two lines marked `???` and run the chunk.
+
+```{r q1b, eval=FALSE}
+adj_matrix <- matrix(c(
+  0, 1, 0, 1,
+  1, 0, 1, 1,
+  0, 1, 0, 1,
+  1, 1, 1, 0
+), nrow = 4, byrow = TRUE)
+
+g2 <- ???                       # create an undirected graph from the matrix
+cat("Number of nodes:", ???, "\n")
+cat("Number of edges:", ???, "\n")
+cat("Degrees:", ???, "\n")      # degree of every node
+
+plot(g2, vertex.size = 30, vertex.color = "salmon",
+     vertex.label.cex = 1.2, main = "Network from Adjacency Matrix")
+```
+
+## Part (c): Add node and edge attributes (5 pts)
+
+Fill in the three lines marked `???` and run the chunk. Your plot should use node size for `wealth`, node colour for `group`, and edge width for `weight`.
+
+```{r q1c, eval=FALSE}
+nodes <- data.frame(
+  id    = c(1, 2, 3, 4, 5),
+  label = c("Alice", "Bob", "Carol", "David", "Eve"),
+  group = c("A", "A", "B", "C", "A"),
+  wealth = c(100, 200, 150, 300, 250)
+)
+
+edges_with_weight <- data.frame(
+  source = c(1, 1, 2, 2, 3, 4),
+  target = c(2, 5, 3, 4, 4, 5),
+  weight = c(3, 1, 2, 4, 2, 1)
+)
+
+g3 <- ???   # create a graph using the edge list and the node list
+
+cat("Node labels:", ???, "\n")
+cat("Edge weights:", ???, "\n")
+
+group_colors <- c("A" = "lightblue", "B" = "salmon", "C" = "lightgreen")
+
+plot(g3,
+     vertex.size   = ???,   # wealth scaled for display
+     vertex.label  = V(g3)$label,
+     vertex.color  = ???,   # colour by group
+     edge.width    = ???,   # edge width by weight
+     vertex.label.cex = 0.9,
+     main = "Network with Node and Edge Attributes")
+```
+
+## Part (d): Interpret the representation (10 pts)
+
+**(i) (5 pts)** What is the difference between an edge list and an adjacency matrix? Give **one advantage** of each format.
+
+> *Your answer here*
+
+**(ii) (5 pts)** In part (c), what do the node attributes `group` and `wealth` and the edge attribute `weight` represent in a social network? Why are attributes useful when analysing a network?
+
+> *Your answer here*
+
+\newpage
+
+# Question 2: Connectivity Measures (25 pts)
+
+Use the network `g3` that you created in Question 1(c) for this question. Start every chunk with:
+
+```{r q2setup, eval=FALSE}
+g <- g3
+```
+
+## Part (a): Basic network information (4 pts)
+
+Fill in the four lines marked `???`.
+
+```{r q2a, eval=FALSE}
+cat("Number of nodes:", ???, "\n")
+cat("Number of edges:", ???, "\n")
+cat("Is connected:", ???, "\n")
+cat("Density:", ???, "\n")
+```
+
+## Part (b): Shortest paths (6 pts)
+
+Fill in the four lines marked `???`. Report the distance and the sequence of nodes on the shortest path from Alice (node `"1"`) to David (node `"4"`).
+
+```{r q2b, eval=FALSE}
+d_1_4 <- ???                 # distance from node "1" to node "4"
+cat("Distance from Alice to David:", d_1_4, "\n")
+
+sp <- shortest_paths(g, from = "1", to = "4", output = "vpath")
+path_nodes <- ???            # numeric node IDs on the shortest path
+path_labels <- ???           # labels of those nodes
+cat("Shortest path:", ???, "\n")
+```
+
+## Part (c): Distance matrix and diameter (8 pts)
+
+Fill in the three lines marked `???`. Report the average path length, the diameter, and one diameter path.
+
+```{r q2c, eval=FALSE}
+dist_matrix <- distances(g)
+rownames(dist_matrix) <- colnames(dist_matrix) <- V(g)$label
+
+cat("Average path length:", ???, "\n")   # mean distance
+cat("Network diameter:", ???, "\n")       # diameter
+
+diam_path <- get_diameter(g)
+cat("Diameter path:", ???, "\n")          # labels of nodes along the diameter path
+```
+
+## Part (d): Components and the giant component (7 pts)
+
+Fill in the three lines marked `???`. Then answer the written question.
+
+```{r q2d, eval=FALSE}
+g_disconnected <- g + vertices("Frank", "Grace") + edges("Frank", "Grace")
+
+comp <- components(g_disconnected)
+cat("Number of components:", ???, "\n")
+cat("Component sizes:", ???, "\n")
+
+giant_idx  <- which.max(comp$csize)
+giant_nodes <- V(g_disconnected)[comp$membership == giant_idx]
+g_giant <- ???                 # extract the giant component
+cat("Giant component is connected:", ???, "\n")
+```
+
+**(i) (3 pts)** How many components does `g_disconnected` have, and which component is the giant component?
+
+> *Your answer here*
+
+\newpage
+
+# Question 3: Centrality Measures (25 pts)
+
+Use `g3` again. In Tutorial 7 Part 3 we computed four centralities. Complete each chunk and answer the interpretation questions.
+
+## Part (a): Degree centrality (6 pts)
+
+Fill in the two lines marked `???`.
+
+```{r q3a, eval=FALSE}
+deg <- ???                # degree of every node
+names(deg) <- V(g)$label
+print(sort(deg, decreasing = TRUE))
+```
+
+**(i) (2 pts)** Which node has the highest degree, and what does that tell you about its position in the network?
+
+> *Your answer here*
+
+## Part (b): Betweenness centrality (7 pts)
+
+Fill in the two lines marked `???`.
+
+```{r q3b, eval=FALSE}
+btw <- ???                  # betweenness centrality
+btw_norm <- ???             # normalised betweenness centrality
+print(sort(btw_norm, decreasing = TRUE))
+```
+
+**(i) (3 pts)** Which node has the highest normalised betweenness? Explain in one or two sentences what a high betweenness score means.
+
+> *Your answer here*
+
+## Part (c): Closeness centrality (6 pts)
+
+Fill in the two lines marked `???`.
+
+```{r q3c, eval=FALSE}
+clo <- ???                  # closeness centrality
+clo_norm <- ???             # normalised closeness centrality
+print(sort(clo_norm, decreasing = TRUE))
+```
+
+**(i) (2 pts)** Which node is most central according to closeness, and what does closeness centrality measure?
+
+> *Your answer here*
+
+## Part (d): Eigenvector centrality and comparison (6 pts)
+
+Fill in the two lines marked `???`.
+
+```{r q3d, eval=FALSE}
+eig <- ???                  # eigenvector centrality
+print(sort(eig, decreasing = TRUE))
+```
+
+**(i) (3 pts)** Compare the top-ranked node by degree and the top-ranked node by eigenvector centrality. Why can eigenvector centrality give a different ranking from degree centrality?
+
+> *Your answer here*
+
+\newpage
+
+# Question 4: Florentine Families Network (25 pts)
+
+This question uses the Florentine marriage network from Tutorial 7 Part 4. Run the setup chunk below to create `g_flo`.
+
+```{r q4setup, eval=FALSE}
+flo_edges <- data.frame(
+  source = c("Acciaiuoli", "Albizzi", "Albizzi", "Albizzi", "Barbadori",
+             "Barbadori", "Bischeri", "Bischeri", "Bischeri", "Castellani",
+             "Castellani", "Ginori", "Guadagni", "Guadagni", "Guadagni",
+             "Lamberteschi", "Medici", "Medici", "Medici", "Pazzi",
+             "Peruzzi", "Ridolfi", "Ridolfi", "Salviati", "Strozzi"),
+  target = c("Medici", "Ginori", "Guadagni", "Medici", "Castellani",
+             "Medici", "Guadagni", "Peruzzi", "Strozzi", "Peruzzi",
+             "Strozzi", "Medici", "Lamberteschi", "Tornabuoni", "Bischeri",
+             "Guadagni", "Ridolfi", "Salviati", "Tornabuoni", "Salviati",
+             "Strozzi", "Strozzi", "Tornabuoni", "Tornabuoni", "Ridolfi")
+)
+
+g_flo <- graph_from_data_frame(flo_edges, directed = FALSE)
+g_flo <- simplify(g_flo)
+```
+
+## Part (a): Build and describe the network (4 pts)
+
+Fill in the two lines marked `???`.
+
+```{r q4a, eval=FALSE}
+cat("Number of families:", ???, "\n")
+cat("Number of marriage ties:", ???, "\n")
+```
+
+## Part (b): Centrality table (8 pts)
+
+Complete the code to compute all four centralities, store them as node attributes, and sort the results by betweenness.
+
+```{r q4b, eval=FALSE}
+V(g_flo)$degree      <- ???
+V(g_flo)$betweenness <- ???
+V(g_flo)$closeness   <- ???   # normalised closeness
+V(g_flo)$eigenvector <- ???
+
+flo_results <- data.frame(
+  Family      = V(g_flo)$name,
+  Degree      = V(g_flo)$degree,
+  Betweenness = round(V(g_flo)$betweenness, 2),
+  Closeness   = round(V(g_flo)$closeness, 4),
+  Eigenvector = round(V(g_flo)$eigenvector, 4)
+)
+
+flo_results <- flo_results[order(-flo_results$Betweenness), ]
+print(flo_results, row.names = FALSE)
+```
+
+## Part (c): The Medici family (8 pts)
+
+Complete the code to report the Medici's four centrality scores and their ranks.
+
+```{r q4c, eval=FALSE}
+medici_idx <- which(V(g_flo)$name == "Medici")
+
+cat("Degree:", V(g_flo)$degree[medici_idx], "\n")
+cat("Betweenness:", round(V(g_flo)$betweenness[medici_idx], 2), "\n")
+cat("Closeness:", round(V(g_flo)$closeness[medici_idx], 4), "\n")
+cat("Eigenvector:", round(V(g_flo)$eigenvector[medici_idx], 4), "\n")
+
+cat("Degree rank:", rank(-V(g_flo)$degree)[medici_idx], "of", vcount(g_flo), "\n")
+cat("Betweenness rank:", rank(-V(g_flo)$betweenness)[medici_idx], "of", vcount(g_flo), "\n")
+cat("Closeness rank:", rank(-V(g_flo)$closeness)[medici_idx], "of", vcount(g_flo), "\n")
+cat("Eigenvector rank:", rank(-V(g_flo)$eigenvector)[medici_idx], "of", vcount(g_flo), "\n")
+```
+
+**(i) (4 pts)** Report the Medici's ranks on the four centrality measures. Which measure makes the Medici stand out most clearly?
+
+> *Your answer here*
+
+**(ii) (4 pts)** Explain, in 2–3 sentences, why the Medici have such high betweenness centrality, and what this tells us about their role as a bridge in the Florentine network.
+
+> *Your answer here*
+
+## Part (d): Visualisation (5 pts)
+
+Complete the code to make a plot in which node size reflects betweenness centrality and the Medici are highlighted in red.
+
+```{r q4d, eval=FALSE}
+btw_flo <- betweenness(g_flo)
+btw_flo_scaled <- (btw_flo / max(btw_flo + 0.001)) * 20 + 10
+
+V(g_flo)$color <- "lightblue"
+V(g_flo)$color[medici_idx] <- "red"
+
+set.seed(42)
+plot(g_flo,
+     vertex.size = ???,
+     vertex.label.cex = 0.6,
+     vertex.label.dist = 0.5,
+     layout = layout_with_fr(g_flo),
+     main = "Florentine Marriage Network\nSize = Betweenness, Red = Medici")
+```
+
+**(i) (2 pts)** What does the plot suggest about the Medici's structural position in the Florentine marriage network?
+
+> *Your answer here*
+
+\newpage
+
+\begin{center}
+\textbf{--- End of Assignment 4 ---}
+\end{center}
