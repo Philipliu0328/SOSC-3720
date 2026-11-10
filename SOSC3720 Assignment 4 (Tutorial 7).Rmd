@@ -36,9 +36,9 @@ edges <- data.frame(
   target = c(2, 4, 3, 4, 4)
 )
 
-g1 <- ???                               # create an undirected graph from edges
-cat("Number of nodes:", ???, "\n")      # number of nodes
-cat("Number of edges:", ???, "\n")      # number of edges
+g1 <- graph_from_data_frame(edges, directed = FALSE)                                # create an undirected graph from edges
+cat("Number of nodes:", vcount(g1), "\n")      # number of nodes
+cat("Number of edges:", ecount(g1), "\n")      # number of edges
 
 plot(g1, vertex.size = 30, vertex.color = "lightblue",
      vertex.label.cex = 1.2, main = "Network from Edge List")
@@ -56,10 +56,10 @@ adj_matrix <- matrix(c(
   1, 1, 1, 0
 ), nrow = 4, byrow = TRUE)
 
-g2 <- ???                       # create an undirected graph from the matrix
-cat("Number of nodes:", ???, "\n")
-cat("Number of edges:", ???, "\n")
-cat("Degrees:", ???, "\n")      # degree of every node
+g2 <- graph_from_adjacency_matrix(adj_matrix, mode = "undirected")                       # create an undirected graph from the matrix
+cat("Number of nodes:", vcount(g2), "\n")
+cat("Number of edges:", ecount(g2) , "\n")
+cat("Degrees:", degree(g2), "\n")      # degree of every node
 
 plot(g2, vertex.size = 30, vertex.color = "salmon",
      vertex.label.cex = 1.2, main = "Network from Adjacency Matrix")
@@ -83,18 +83,18 @@ edges_with_weight <- data.frame(
   weight = c(3, 1, 2, 4, 2, 1)
 )
 
-g3 <- ???   # create a graph using the edge list and the node list
+g3 <- graph_from_data_frame(edges_with_weight, directed = FALSE, vertices = nodes)   # create a graph using the edge list and the node list
 
-cat("Node labels:", ???, "\n")
-cat("Edge weights:", ???, "\n")
+cat("Node labels:", V(g3)$label, "\n")
+cat("Edge weights:", E(g3)$weight, "\n")
 
 group_colors <- c("A" = "lightblue", "B" = "salmon", "C" = "lightgreen")
 
 plot(g3,
-     vertex.size   = ???,   # wealth scaled for display
+     vertex.size   = V(g3)$wealth/3 ,   # wealth scaled for display
      vertex.label  = V(g3)$label,
-     vertex.color  = ???,   # colour by group
-     edge.width    = ???,   # edge width by weight
+     vertex.color  = group_colors[V(g3)$group],   # colour by group
+     edge.width    = E(g3)$weight,   # edge width by weight
      vertex.label.cex = 0.9,
      main = "Network with Node and Edge Attributes")
 ```
@@ -103,11 +103,17 @@ plot(g3,
 
 **(i) (5 pts)** What is the difference between an edge list and an adjacency matrix? Give **one advantage** of each format.
 
-> *Your answer here*
+> An edge list lists only the edges that actually exist.While adjacency matrix stores a value for **e**very possible pair of nodes, including many zeros when the network is sparse.
+>
+> Advantages: Edge list : more efficient for sparse network , because we only need to store the existing edges rather than a nxn matrix ; Adjacency Matrix : it's more efficient for edge lookup and matrix computation operation
 
 **(ii) (5 pts)** In part (c), what do the node attributes `group` and `wealth` and the edge attribute `weight` represent in a social network? Why are attributes useful when analysing a network?
 
-> *Your answer here*
+> Node attributes - Group: A categorical characteristic of each social groups ; Wealth : A quantative characteristic of each social groups (which is used to scale node size with larger the node , greater the wealth characteristics
+>
+> Edge Attribute - weight : represent the strength, frequency or importance of an relationship
+>
+> Attributes turns a purelry structured network into an rich, interpretable model by visualise meaningful differences
 
 \newpage
 
@@ -124,10 +130,10 @@ g <- g3
 Fill in the four lines marked `???`.
 
 ```{r q2a, eval=FALSE}
-cat("Number of nodes:", ???, "\n")
-cat("Number of edges:", ???, "\n")
-cat("Is connected:", ???, "\n")
-cat("Density:", ???, "\n")
+cat("Number of nodes:",vcount(g), "\n")
+cat("Number of edges:", ecount(g), "\n")
+cat("Is connected:", is_connected(g), "\n")
+cat("Density:", edge_density(g), "\n")
 ```
 
 ## Part (b): Shortest paths (6 pts)
@@ -135,13 +141,13 @@ cat("Density:", ???, "\n")
 Fill in the four lines marked `???`. Report the distance and the sequence of nodes on the shortest path from Alice (node `"1"`) to David (node `"4"`).
 
 ```{r q2b, eval=FALSE}
-d_1_4 <- ???                 # distance from node "1" to node "4"
+d_1_4 <- distances(g, v = "1", to = "4")[1, 1]                # distance from node "1" to node "4"
 cat("Distance from Alice to David:", d_1_4, "\n")
 
 sp <- shortest_paths(g, from = "1", to = "4", output = "vpath")
-path_nodes <- ???            # numeric node IDs on the shortest path
-path_labels <- ???           # labels of those nodes
-cat("Shortest path:", ???, "\n")
+path_nodes <-  as.numeric(sp$vpath[[1]])             # numeric node IDs on the shortest path
+path_labels <- V(g)$label[path_nodes]           # labels of those nodes
+cat("Shortest path:", paste(path_labels, collapse = " -> "), "\n")
 ```
 
 ## Part (c): Distance matrix and diameter (8 pts)
