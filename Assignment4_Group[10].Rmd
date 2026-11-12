@@ -113,7 +113,7 @@ plot(g3,
 >
 > Edge Attribute - weight : represent the strength, frequency or importance of an relationship
 >
-> Attributes turns a purelry structured network into an rich, interpretable model by visualise meaningful differences
+> Attributes turns a purely structured network into an rich, interpretable model by visualise meaningful differences
 
 \newpage
 
@@ -158,11 +158,11 @@ Fill in the three lines marked `???`. Report the average path length, the diamet
 dist_matrix <- distances(g)
 rownames(dist_matrix) <- colnames(dist_matrix) <- V(g)$label
 
-cat("Average path length:", ???, "\n")   # mean distance
-cat("Network diameter:", ???, "\n")       # diameter
+cat("Average path length:", mean(dist_matrix[upper.tri(dist_matrix)]), "\n")   # mean distance
+cat("Network diameter:", max(dist_matrix), "\n")       # diameter
 
 diam_path <- get_diameter(g)
-cat("Diameter path:", ???, "\n")          # labels of nodes along the diameter path
+cat("Diameter path:", paste(V(g)$label[diam_path], collapse = " -> "), "\n")          # labels of nodes along the diameter path
 ```
 
 ## Part (d): Components and the giant component (7 pts)
@@ -173,18 +173,20 @@ Fill in the three lines marked `???`. Then answer the written question.
 g_disconnected <- g + vertices("Frank", "Grace") + edges("Frank", "Grace")
 
 comp <- components(g_disconnected)
-cat("Number of components:", ???, "\n")
-cat("Component sizes:", ???, "\n")
+cat("Number of components:", comp$no, "\n")
+cat("Component sizes:", comp$size, "\n")
 
 giant_idx  <- which.max(comp$csize)
 giant_nodes <- V(g_disconnected)[comp$membership == giant_idx]
-g_giant <- ???                 # extract the giant component
-cat("Giant component is connected:", ???, "\n")
+g_giant <- induced_subgraph(g_disconnected, giant_nodes)                # extract the giant component
+cat("Giant component is connected:", is_connected(g_giant), "\n")
 ```
 
 **(i) (3 pts)** How many components does `g_disconnected` have, and which component is the giant component?
 
-> *Your answer here*
+> g_disconnected has 2 components
+>
+> The giant components is Alice, Bob, Carol, David, and Eve
 
 \newpage
 
