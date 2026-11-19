@@ -83,18 +83,18 @@ edges_with_weight <- data.frame(
   weight = c(3, 1, 2, 4, 2, 1)
 )
 
-g3 <- graph_from_data_frame(edges_with_weight, directed = FALSE, vertices = nodes)    # create a graph using the edge list and the node list
+g3 <- graph_from_data_frame(edges_with_weight, directed = FALSE, vertices = nodes)   # create a graph using the edge list and the node list
 
-cat("Node labels:", ???, "\n")
-cat("Edge weights:", ???, "\n")
+cat("Node labels:", V(g3)$label, "\n")
+cat("Edge weights:", E(g3)$weight, "\n")
 
 group_colors <- c("A" = "lightblue", "B" = "salmon", "C" = "lightgreen")
 
 plot(g3,
-     vertex.size   = ???,   # wealth scaled for display
+     vertex.size   = V(g3)$wealth/3 ,   # wealth scaled for display
      vertex.label  = V(g3)$label,
-     vertex.color  = ???,   # colour by group
-     edge.width    = ???,   # edge width by weight
+     vertex.color  = group_colors[V(g3)$group],   # colour by group
+     edge.width    = E(g3)$weight,   # edge width by weight
      vertex.label.cex = 0.9,
      main = "Network with Node and Edge Attributes")
 ```
