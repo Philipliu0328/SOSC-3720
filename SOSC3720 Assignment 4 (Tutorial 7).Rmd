@@ -231,7 +231,7 @@ print(sort(clo_norm, decreasing = TRUE))
 
 **(i) (2 pts)** Which node is most central according to closeness, and what does closeness centrality measure?
 
-> *Node 2 and node 4 are the most central according to closeness. Closeness centrality measures* the easiness of each node is to reach other nodes.
+> *Node 2 and node 4 are the most central according to closeness. Closeness centrality measures* the easiness of each node to reach other nodes.
 
 ## Part (d): Eigenvector centrality and comparison (6 pts)
 
@@ -275,8 +275,8 @@ g_flo <- simplify(g_flo)
 Fill in the two lines marked `???`.
 
 ```{r q4a, eval=FALSE}
-cat("Number of families:", ???, "\n")
-cat("Number of marriage ties:", ???, "\n")
+cat("Number of families:", vcount(g_flo), "\n")
+cat("Number of marriage ties:", ecount(g_flo), "\n")
 ```
 
 ## Part (b): Centrality table (8 pts)
@@ -284,10 +284,14 @@ cat("Number of marriage ties:", ???, "\n")
 Complete the code to compute all four centralities, store them as node attributes, and sort the results by betweenness.
 
 ```{r q4b, eval=FALSE}
-V(g_flo)$degree      <- ???
-V(g_flo)$betweenness <- ???
-V(g_flo)$closeness   <- ???   # normalised closeness
-V(g_flo)$eigenvector <- ???
+V(g_flo)$degree      <- degree(g_flo, mode = "all", loops = FALSE)
+V(g_flo)$betweenness <- betweenness(g_flo, directed = FALSE, weights = NA)
+V(g_flo)$closeness   <- closeness(
+  g_flo, mode = "all", weights = NA, normalized = TRUE
+)   # normalised closeness
+V(g_flo)$eigenvector <- eigen_centrality(
+  g_flo, directed = FALSE, weights = NA
+)$vector
 
 flo_results <- data.frame(
   Family      = V(g_flo)$name,
@@ -321,7 +325,7 @@ cat("Eigenvector rank:", rank(-V(g_flo)$eigenvector)[medici_idx], "of", vcount(g
 
 **(i) (4 pts)** Report the Medici's ranks on the four centrality measures. Which measure makes the Medici stand out most clearly?
 
-> *Your answer here*
+> *For the degree centrality, betweenness centrality, closeness centrality and eigenvector centrality, Medici ranks the first for all these four centralities.*
 
 **(ii) (4 pts)** Explain, in 2–3 sentences, why the Medici have such high betweenness centrality, and what this tells us about their role as a bridge in the Florentine network.
 
@@ -340,7 +344,7 @@ V(g_flo)$color[medici_idx] <- "red"
 
 set.seed(42)
 plot(g_flo,
-     vertex.size = ???,
+     vertex.size = btw_flo_scaled,
      vertex.label.cex = 0.6,
      vertex.label.dist = 0.5,
      layout = layout_with_fr(g_flo),
