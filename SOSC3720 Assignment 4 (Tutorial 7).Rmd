@@ -211,7 +211,7 @@ Fill in the two lines marked `???`.
 ```{r q3b, eval=FALSE}
 btw <- betweenness(g, directed = FALSE, weights = NA)                  # betweenness centrality
 btw_norm <- betweenness(g, directed = FALSE, weights = NA, normalized = TRUE)
-             # normalised betweenness centrality
+      # normalised betweenness centrality
 print(sort(btw_norm, decreasing = TRUE))
 ```
 
@@ -244,7 +244,7 @@ print(sort(eig, decreasing = TRUE))
 
 **(i) (3 pts)** Compare the top-ranked node by degree and the top-ranked node by eigenvector centrality. Why can eigenvector centrality give a different ranking from degree centrality?
 
-> *Your answer here*
+> *Nodes 2 and 4*
 
 \newpage
 
