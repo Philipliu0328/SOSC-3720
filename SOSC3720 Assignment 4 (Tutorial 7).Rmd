@@ -83,7 +83,7 @@ edges_with_weight <- data.frame(
   weight = c(3, 1, 2, 4, 2, 1)
 )
 
-g3 <- graph_from_data_frame(edges_with_weight, directed = FALSE, vertices = nodes)   # create a graph using the edge list and the node list
+g3 <- graph_from_data_frame(edges_with_weight, directed = FALSE, vertices = nodes)    # create a graph using the edge list and the node list
 
 cat("Node labels:", ???, "\n")
 cat("Edge weights:", ???, "\n")
