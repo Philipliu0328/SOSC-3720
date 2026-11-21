@@ -199,55 +199,56 @@ Use `g3` again. In Tutorial 7 Part 3 we computed four centralities. Complete eac
 Fill in the two lines marked `???`.
 
 ```{r q3a, eval=FALSE}
-deg <- ???                # degree of every node
+deg <- degree(g, mode = "all", loops = FALSE)                    # degree of every node
 names(deg) <- V(g)$label
 print(sort(deg, decreasing = TRUE))
 ```
 
 **(i) (2 pts)** Which node has the highest degree, and what does that tell you about its position in the network?
 
-> *Your answer here*
+> *Bob and David have the highest degree. That proves these nodes connect to the most* number of neighbours in the network.
 
 ## Part (b): Betweenness centrality (7 pts)
 
 Fill in the two lines marked `???`.
 
 ```{r q3b, eval=FALSE}
-btw <- ???                  # betweenness centrality
-btw_norm <- ???             # normalised betweenness centrality
+btw <- betweenness(g, directed = FALSE, weights = NA)                  # betweenness centrality
+btw_norm <- betweenness(g, directed = FALSE, weights = NA, normalized = TRUE)
+      # normalised betweenness centrality
 print(sort(btw_norm, decreasing = TRUE))
 ```
 
 **(i) (3 pts)** Which node has the highest normalised betweenness? Explain in one or two sentences what a high betweenness score means.
 
-> *Your answer here*
+> *Node 2 (Bob) and Node 4 (David) have the highest normalized betweenness. A high score means that the node is important* as an intermediary between any two nodes in the network.
 
 ## Part (c): Closeness centrality (6 pts)
 
 Fill in the two lines marked `???`.
 
 ```{r q3c, eval=FALSE}
-clo <- ???                  # closeness centrality
-clo_norm <- ???             # normalised closeness centrality
+clo <- closeness(g, mode = "all", weights = NA)                  # closeness centrality
+clo_norm <- closeness(g, mode = "all", weights = NA, normalized = TRUE)             # normalised closeness centrality
 print(sort(clo_norm, decreasing = TRUE))
 ```
 
 **(i) (2 pts)** Which node is most central according to closeness, and what does closeness centrality measure?
 
-> *Your answer here*
+> *Node 2 (Bob) and node 4 (David) are the most central according to closeness. Closeness centrality measures* the easiness of each node to reach other nodes.
 
 ## Part (d): Eigenvector centrality and comparison (6 pts)
 
 Fill in the two lines marked `???`.
 
 ```{r q3d, eval=FALSE}
-eig <- ???                  # eigenvector centrality
+eig <- eigen_centrality(g, directed = FALSE, weights = NA)$vector                  # eigenvector centrality
 print(sort(eig, decreasing = TRUE))
 ```
 
 **(i) (3 pts)** Compare the top-ranked node by degree and the top-ranked node by eigenvector centrality. Why can eigenvector centrality give a different ranking from degree centrality?
 
-> *Your answer here*
+> *Node 2 (Bob) and node 4 (David) are on the top of eigenvector centrality.* The rankings can differ because degree measures the number of neighbors that a node connects, while eigenvector centrality also considers how influential those neighbors are. A node with fewer ties can rank highly on eigenvector centrality if its connections are themselves highly central.
 
 \newpage
 
@@ -278,8 +279,8 @@ g_flo <- simplify(g_flo)
 Fill in the two lines marked `???`.
 
 ```{r q4a, eval=FALSE}
-cat("Number of families:", ???, "\n")
-cat("Number of marriage ties:", ???, "\n")
+cat("Number of families:", vcount(g_flo), "\n")
+cat("Number of marriage ties:", ecount(g_flo), "\n")
 ```
 
 ## Part (b): Centrality table (8 pts)
@@ -287,10 +288,14 @@ cat("Number of marriage ties:", ???, "\n")
 Complete the code to compute all four centralities, store them as node attributes, and sort the results by betweenness.
 
 ```{r q4b, eval=FALSE}
-V(g_flo)$degree      <- ???
-V(g_flo)$betweenness <- ???
-V(g_flo)$closeness   <- ???   # normalised closeness
-V(g_flo)$eigenvector <- ???
+V(g_flo)$degree      <- degree(g_flo, mode = "all", loops = FALSE)
+V(g_flo)$betweenness <- betweenness(g_flo, directed = FALSE, weights = NA)
+V(g_flo)$closeness   <- closeness(
+  g_flo, mode = "all", weights = NA, normalized = TRUE
+)   # normalised closeness
+V(g_flo)$eigenvector <- eigen_centrality(
+  g_flo, directed = FALSE, weights = NA
+)$vector
 
 flo_results <- data.frame(
   Family      = V(g_flo)$name,
@@ -324,11 +329,11 @@ cat("Eigenvector rank:", rank(-V(g_flo)$eigenvector)[medici_idx], "of", vcount(g
 
 **(i) (4 pts)** Report the Medici's ranks on the four centrality measures. Which measure makes the Medici stand out most clearly?
 
-> *Your answer here*
+> *For all the four centralities: the degree centrality, betweenness centrality, closeness centrality and eigenvector centrality, Medici ranks the first for all of them. Among them, between centrality makes the Medici stand out most clearly since* it highlights the Medici’s position as a bridge between other families.
 
 **(ii) (4 pts)** Explain, in 2–3 sentences, why the Medici have such high betweenness centrality, and what this tells us about their role as a bridge in the Florentine network.
 
-> *Your answer here*
+> The Medici have high betweenness centrality because there are many shortest paths which connect other Florentine families, passing through the Medici. This suggests they acted as brokers, linking groups that were less directly connected and giving them opportunities to facilitate the flow of information and relationships across the network.
 
 ## Part (d): Visualisation (5 pts)
 
@@ -343,7 +348,7 @@ V(g_flo)$color[medici_idx] <- "red"
 
 set.seed(42)
 plot(g_flo,
-     vertex.size = ???,
+     vertex.size = btw_flo_scaled,
      vertex.label.cex = 0.6,
      vertex.label.dist = 0.5,
      layout = layout_with_fr(g_flo),
@@ -352,7 +357,7 @@ plot(g_flo,
 
 **(i) (2 pts)** What does the plot suggest about the Medici's structural position in the Florentine marriage network?
 
-> *Your answer here*
+> The plot places the Medici near the center of the Florentine network. This suggests they connected otherwise less-connected families. The plot also shows *Medici has the largest* node size, reflecting it has the highest betweenness*. This suggests* that Medici has the most shortest paths which connect other Florentine families, to pass through itself.
 
 \newpage
 
