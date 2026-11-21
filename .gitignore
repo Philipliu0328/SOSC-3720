@@ -1,2 +1,48 @@
+# R / RStudio
+.Rhistory
+.Rapp.history
+.RData
+.RDataTmp
+.Ruserdata
+.Rproj.user/
+*.Rproj
+.Renviron
+.Rprofile
 
-.Rproj.user
+# R package build
+*.tar.gz
+*.Rcheck/
+*.so
+*.o
+*.dll
+
+# Quarto / R Markdown
+*_cache/
+*_files/
+*.knit.md
+*.utf8.md
+/.quarto/
+
+# IDEs
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Logs and temp files
+*.log
+*.tmp
+*~
+
+# Project-specific data
+# data/raw/
+# data/private/
